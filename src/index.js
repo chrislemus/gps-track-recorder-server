@@ -1,24 +1,31 @@
-const express = require('express')
-const mongoose = require('mongoose')
-const app = express()
-const {mongoDbPassword} = require('./apiConfig')
+require('./models/User');
+require('dotenv').config();
+const express = require('express');
+const mongoose = require('mongoose');
+const bodyParser = require('body-parser');
+const app = express();
 
-const mongoUri = `mongodb+srv://admin:${mongoDbPassword}@cluster0.clp4t.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`
+const authRoutes = require('./routes/authRoutes');
+const requireAuth = require('./middlewares/requireAuth');
+app.use(bodyParser.json());
+app.use(authRoutes);
+const mongoDbPassword = process.env.MONGO_DB_PASSWORD;
+const mongoUri = `mongodb+srv://admin:${mongoDbPassword}@cluster0.clp4t.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`;
 mongoose.connect(mongoUri, {
   useNewUrlParser: true,
-  useCreateIndex: true
-})
+  useCreateIndex: true,
+});
 mongoose.connection.on('connected', () => {
-  console.log('Connected to mongo instance')
-})
+  console.log('Connected to mongo instance');
+});
 mongoose.connection.on('error', () => {
-  console.error('error connecting to mongo')
-})
+  console.error('error connecting to mongo');
+});
 
-app.get('/', (req, res) => {
-  res.send('hi there')
-})
+app.get('/', requireAuth, (req, res) => {
+  res.send(`Your email is ${req.user.email}`);
+});
 
 app.listen(3000, () => {
-  console.log("listening on port 3000")
-})
+  console.log('listening on port 3000');
+});

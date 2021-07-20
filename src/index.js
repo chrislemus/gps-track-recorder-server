@@ -1,4 +1,5 @@
 require('./models/User');
+require('./models/Track');
 require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
@@ -6,9 +7,12 @@ const bodyParser = require('body-parser');
 const app = express();
 
 const authRoutes = require('./routes/authRoutes');
+const trackRoutes = require('./routes/trackRoutes');
 const requireAuth = require('./middlewares/requireAuth');
+
 app.use(bodyParser.json());
 app.use(authRoutes);
+app.use(trackRoutes);
 const mongoDbPassword = process.env.MONGO_DB_PASSWORD;
 const mongoUri = `mongodb+srv://admin:${mongoDbPassword}@cluster0.clp4t.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`;
 mongoose.connect(mongoUri, {
